@@ -1,0 +1,5 @@
+D:\PrimMesher\PrimMesher\bin\Debug\PrimMesher.dll
+D:\PrimMesher\PrimMesher\bin\Debug\PrimMesher.pdb
+D:\PrimMesher\PrimMesher\obj\Debug\ResolveAssemblyReference.cache
+D:\PrimMesher\PrimMesher\obj\Debug\PrimMesher.dll
+D:\PrimMesher\PrimMesher\obj\Debug\PrimMesher.pdb

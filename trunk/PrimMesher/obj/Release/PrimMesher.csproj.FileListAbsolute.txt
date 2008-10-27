@@ -1,0 +1,11 @@
+C:\Documents and Settings\Tom\Local Settings\Application Data\Temporary Projects\PrimMesher\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\Tom\My Documents\Visual Studio 2008\Projects\PrimMesher\PrimMesher\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\Tom\My Documents\Visual Studio 2008\Projects\PrimMesher\PrimMesher\bin\Release\PrimMesher.dll
+C:\Documents and Settings\Tom\My Documents\Visual Studio 2008\Projects\PrimMesher\PrimMesher\bin\Release\PrimMesher.pdb
+C:\Documents and Settings\Tom\My Documents\Visual Studio 2008\Projects\PrimMesher\PrimMesher\obj\Release\PrimMesher.dll
+C:\Documents and Settings\Tom\My Documents\Visual Studio 2008\Projects\PrimMesher\PrimMesher\obj\Release\PrimMesher.pdb
+D:\PrimMesher\PrimMesher\bin\Release\PrimMesher.dll
+D:\PrimMesher\PrimMesher\bin\Release\PrimMesher.pdb
+D:\PrimMesher\PrimMesher\obj\Release\ResolveAssemblyReference.cache
+D:\PrimMesher\PrimMesher\obj\Release\PrimMesher.dll
+D:\PrimMesher\PrimMesher\obj\Release\PrimMesher.pdb
