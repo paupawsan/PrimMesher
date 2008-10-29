@@ -1329,12 +1329,13 @@ namespace PrimMesher
                             float u2 = 1.0f;
                             if (whichVert < newLayer.us.Count - 1)
                                 u2 = newLayer.us[whichVert + 1];
-                            if (sides < 5 && whichVert < sides)
+                            int whichOuterVert = (hasProfileCut && hasHollow) ? whichVert - 1 : whichVert;
+                            if (sides < 5 && whichOuterVert < sides)
                             {
                                 u1 *= sides;
                                 u2 *= sides;
-                                u1 -= whichVert;
-                                u2 -= whichVert;
+                                u1 -= whichOuterVert;
+                                u2 -= whichOuterVert;
                                 if (u2 < 0.1f)
                                     u2 = 1.0f;
 
@@ -1663,7 +1664,6 @@ namespace PrimMesher
 
                             this.viewerFaces.Add(newViewerFace);
                         }
-
                     }
                 }
 
@@ -1722,6 +1722,12 @@ namespace PrimMesher
                             if (whichVert < newLayer.us.Count - 1)
                                 u2 = newLayer.us[whichVert + 1];
 
+                            if (whichVert == cut1Vert || whichVert == cut2Vert)
+                            {
+                                u1 = 0.0f;
+                                u2 = 1.0f;
+                            }
+
                             newViewerFace1.uv1.U = u1;
                             newViewerFace1.uv2.U = u1;
                             newViewerFace1.uv3.U = u2;
@@ -1746,32 +1752,23 @@ namespace PrimMesher
                             newViewerFace2.v2 = this.coords[iNext - numVerts];
                             newViewerFace2.v3 = this.coords[iNext];
 
-                            //if (whichVert == newLayer.numOuterVerts - 1 && hasProfileCut)
-                            //{  // start profile cut faces
-
-                            //    newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal1;
-                            //    newViewerFace1.n3 = newLayer.cutNormal1;
-
-                            //    newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal2;
-                            //    newViewerFace2.n2 = lastCutNormal2;
-                            //}
                             if (whichVert == cut1Vert)
                             {
 
-                                //newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal1;
-                                //newViewerFace1.n3 = newLayer.cutNormal1;
+                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal1;
+                                newViewerFace1.n3 = newLayer.cutNormal1;
 
-                                //newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal1;
-                                //newViewerFace2.n2 = lastCutNormal1;
+                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal1;
+                                newViewerFace2.n2 = lastCutNormal1;
                             }
                             else if (whichVert == cut2Vert)
                             {
 
-                                //newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal2;
-                                //newViewerFace1.n3 = newLayer.cutNormal2;
+                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal2;
+                                newViewerFace1.n3 = newLayer.cutNormal2;
 
-                                //newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal2;
-                                //newViewerFace2.n2 = lastCutNormal2;
+                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal2;
+                                newViewerFace2.n2 = lastCutNormal2;
                             }
 
                             else // periphery faces
