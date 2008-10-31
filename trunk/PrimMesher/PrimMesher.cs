@@ -1250,8 +1250,7 @@ namespace PrimMesher
                     if (this.viewerMode)
                     {
                         Coord faceNormal = newLayer.faceNormal;
-                        ViewerFace newViewerFace = new ViewerFace();
-                        newViewerFace.primFaceNumber = 0;
+                        ViewerFace newViewerFace = new ViewerFace(0);
                         foreach (Face face in newLayer.faces)
                         {
                             newViewerFace.v1 = newLayer.coords[face.v1];
@@ -1325,27 +1324,28 @@ namespace PrimMesher
                                 primFaceNum = 2;
                             ViewerFace newViewerFace1 = new ViewerFace(primFaceNum);
                             ViewerFace newViewerFace2 = new ViewerFace(primFaceNum);
+
                             float u1 = newLayer.us[whichVert];
                             float u2 = 1.0f;
                             if (whichVert < newLayer.us.Count - 1)
                                 u2 = newLayer.us[whichVert + 1];
-                            int whichOuterVert = (hasProfileCut && hasHollow) ? whichVert - 1 : whichVert;
-                            if (sides < 5 && whichOuterVert < sides)
-                            {
-                                u1 *= sides;
-                                u2 *= sides;
-                                u1 -= whichOuterVert;
-                                u2 -= whichOuterVert;
-                                if (u2 < 0.1f)
-                                    u2 = 1.0f;
-
-                                newViewerFace2.primFaceNumber = newViewerFace1.primFaceNumber = whichVert + 1;
-                            }
 
                             if (whichVert == cut1Vert || whichVert == cut2Vert)
                             {
                                 u1 = 0.0f;
                                 u2 = 1.0f;
+                            }
+                            else if (sides < 5)
+                            { // boxes and prisms have one texture face per side of the prim, so the U values have to be scaled
+                                // to reflect the entire texture width
+                                u1 *= profile.numOuterVerts;
+                                u2 *= profile.numOuterVerts;
+                                u2 -= (int)u1;
+                                u1 -= (int)u1;
+                                if (u2 < 0.1f)
+                                    u2 = 1.0f;
+
+                                newViewerFace2.primFaceNumber = newViewerFace1.primFaceNumber = whichVert + 1;
                             }
 
                             newViewerFace1.uv1.U = u1;
