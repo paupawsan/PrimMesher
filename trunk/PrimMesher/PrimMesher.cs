@@ -1338,8 +1338,8 @@ namespace PrimMesher
                             else if (sides < 5)
                             { // boxes and prisms have one texture face per side of the prim, so the U values have to be scaled
                                 // to reflect the entire texture width
-                                u1 *= profile.numOuterVerts;
-                                u2 *= profile.numOuterVerts;
+                                u1 *= sides;
+                                u2 *= sides;
                                 u2 -= (int)u1;
                                 u1 -= (int)u1;
                                 if (u2 < 0.1f)
