@@ -1375,27 +1375,24 @@ namespace PrimMesher
                             // profile cut faces
                             if (whichVert == cut1Vert)
                             {
+                                newViewerFace1.n1 = newLayer.cutNormal1;
+                                newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal1;
 
-                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal1;
-                                newViewerFace1.n3 = newLayer.cutNormal1;
-
-                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal1;
+                                newViewerFace2.n1 = newViewerFace2.n3 = newLayer.cutNormal1;
                                 newViewerFace2.n2 = lastCutNormal1;
                             }
                             else if (whichVert == cut2Vert)
                             {
+                                newViewerFace1.n1 = newLayer.cutNormal2;
+                                newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal2;
 
-                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal2;
-                                newViewerFace1.n3 = newLayer.cutNormal2;
-
-                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal2;
+                                newViewerFace2.n1 = newViewerFace2.n3 = newLayer.cutNormal2;
                                 newViewerFace2.n2 = lastCutNormal2;
                             }
 
                             else // outer and hollow faces
                             {
-                                //if ((sides < 5 && whichVert < newLayer.numOuterVerts) || (hollowSides < 5 && whichVert >= newLayer.numOuterVerts))
-                                if (sides < 5)
+                                if ((sides < 5 && whichVert < newLayer.numOuterVerts) || (hollowSides < 5 && whichVert >= newLayer.numOuterVerts))
                                 {
                                     newViewerFace1.CalcSurfaceNormal();
                                     newViewerFace2.CalcSurfaceNormal();
@@ -1754,27 +1751,24 @@ namespace PrimMesher
 
                             if (whichVert == cut1Vert)
                             {
+                                newViewerFace1.n1 = newLayer.cutNormal1;
+                                newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal1;
 
-                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal1;
-                                newViewerFace1.n3 = newLayer.cutNormal1;
-
-                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal1;
+                                newViewerFace2.n1 = newViewerFace2.n3 = newLayer.cutNormal1;
                                 newViewerFace2.n2 = lastCutNormal1;
                             }
                             else if (whichVert == cut2Vert)
                             {
+                                newViewerFace1.n1 = newLayer.cutNormal2;
+                                newViewerFace1.n2 = newViewerFace1.n3 = lastCutNormal2;
 
-                                newViewerFace1.n2 = newViewerFace1.n1 = lastCutNormal2;
-                                newViewerFace1.n3 = newLayer.cutNormal2;
-
-                                newViewerFace2.n3 = newViewerFace2.n1 = newLayer.cutNormal2;
+                                newViewerFace2.n1 = newViewerFace2.n3 = newLayer.cutNormal2;
                                 newViewerFace2.n2 = lastCutNormal2;
                             }
 
                             else // periphery faces
                             {
-                                //if ((sides < 5 && whichVert < newLayer.numOuterVerts) || (hollowSides < 5 && whichVert >= newLayer.numOuterVerts))
-                                if (sides < 5)
+                                if ((sides < 5 && whichVert < newLayer.numOuterVerts) || (hollowSides < 5 && whichVert >= newLayer.numOuterVerts))
                                 {
                                     newViewerFace1.CalcSurfaceNormal();
                                     newViewerFace2.CalcSurfaceNormal();
