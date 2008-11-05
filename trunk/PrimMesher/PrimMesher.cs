@@ -679,7 +679,7 @@ namespace PrimMesher
                         else
                             hollowNormals.Add(new Coord(-angle.X, -angle.Y, 0.0f));
 
-                        hollowUs.Add(angle.angle);
+                        hollowUs.Add(angle.angle * hollow);
                     }
                 }
             }
@@ -729,7 +729,7 @@ namespace PrimMesher
                             else
                                 hollowNormals.Add(new Coord(-angle.X, -angle.Y, 0.0f));
 
-                            hollowUs.Add(angle.angle);
+                            hollowUs.Add(angle.angle * hollow);
                         }
                     }
                 }
@@ -890,7 +890,7 @@ namespace PrimMesher
         {
             this.faceUVs = new List<UVCoord>();
             foreach (Coord c in this.coords)
-                this.faceUVs.Add(new UVCoord(0.5f + c.X, 0.5f - c.Y));
+                this.faceUVs.Add(new UVCoord(1.0f - (0.5f + c.X), 1.0f - (0.5f - c.Y)));
         }
 
         public Profile Clone()
@@ -1016,7 +1016,7 @@ namespace PrimMesher
             for (i = 0; i < numfaceUVs; i++)
             {
                 UVCoord uv = this.faceUVs[i];
-                uv.U = 1.0f - uv.U;
+                uv.V = 1.0f - uv.V;
                 this.faceUVs[i] = uv;
             }
         }
@@ -1776,6 +1776,18 @@ namespace PrimMesher
                             {
                                 u1 = 0.0f;
                                 u2 = 1.0f;
+                            }
+                            else if (sides < 5)
+                            { // boxes and prisms have one texture face per side of the prim, so the U values have to be scaled
+                                // to reflect the entire texture width
+                                u1 *= sides;
+                                u2 *= sides;
+                                u2 -= (int)u1;
+                                u1 -= (int)u1;
+                                if (u2 < 0.1f)
+                                    u2 = 1.0f;
+
+                                newViewerFace2.primFaceNumber = newViewerFace1.primFaceNumber = whichVert + 1;
                             }
 
                             newViewerFace1.uv1.U = u1;
