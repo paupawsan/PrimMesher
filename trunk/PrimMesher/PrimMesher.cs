@@ -674,7 +674,7 @@ namespace PrimMesher
                     hollowCoords.Add(newVert);
                     if (this.calcVertexNormals)
                     {
-                        if (sides < 5)
+                        if (hollowSides < 5)
                             hollowNormals.Add(hollowAngles.normals[i].Invert());
                         else
                             hollowNormals.Add(new Coord(-angle.X, -angle.Y, 0.0f));
