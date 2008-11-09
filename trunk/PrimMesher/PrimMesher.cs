@@ -912,7 +912,7 @@ namespace PrimMesher
                     if (this.faceNumbers[i] == 0)
                         this.faceNumbers[i] = faceNum++;
 
-                this.numPrimFaces = faceNum - 1;
+                this.numPrimFaces = faceNum;
             }
 
         }
