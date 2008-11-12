@@ -17,8 +17,8 @@ namespace PrimMesher
         private List<Coord> normals;
         private List<UVCoord> uvs;
 
-        public enum SculptType { sphere = 1, torus = 2, plane = 3 };
-        private const float pixScale = 0.00390625f;
+        public enum SculptType { sphere = 1, torus = 2, plane = 3, cylinder = 4};
+        private const float pixScale = 0.00390625f; // 1.0 / 256
 
         public SculptMesh(Bitmap bitmap, SculptType sculptType, int lod, bool viewerMode)
         {
@@ -32,42 +32,57 @@ namespace PrimMesher
             int width = bitmap.Width;
             int height = bitmap.Height;
 
+            if (width > lod || height > lod)
+            {
+                // todo: if either width or height are greater than lod then rescale image here
+            }
+
             float widthUnit = 1.0f / width;
             float heightUnit = 1.0f / height;
+
+            int p1, p2, p3, p4;
+            Color color;
+            float x, y, z;
 
             for (int imageY = 0; imageY < height; imageY++)
             {
                 int rowOffset = imageY * width;
+                int pixelsAcross = sculptType == SculptType.plane ? width : width + 1;
 
-                for (int imageX = 0; imageX < width; imageX++)
+                for (int imageX = 0; imageX < pixelsAcross; imageX++)
                 {
-                    Color color = bitmap.GetPixel(imageX, imageY);
-
-                    float x = color.R * pixScale - 0.5f;
-                    float y = color.G * pixScale - 0.5f;
-                    float z = color.B * pixScale - 0.5f;
-
                      /*
-                     * u1,v1   u2,v1
                      *   p1-----p2
                      *   | \ f2 |
                      *   |   \  |
                      *   | f1  \|
                      *   p3-----p4
-                     * u1,v2   u2,v2
                      */
-                    int p4 = rowOffset + imageX;
-                    int p3 = p4 - 1;
-                    int p2 = p4 - width;
-                    int p1 = p3 - width;
+
+                    if (imageX < width)
+                    {
+                        p4 = rowOffset + imageX;
+                        p3 = p4 - 1;
+                    }
+                    else
+                    {
+                        p4 = rowOffset; // wrap around to beginning
+                        p3 = rowOffset + imageX - 1;
+                    }
+
+                    p2 = p4 - width;
+                    p1 = p3 - width;
+
+                    color = bitmap.GetPixel(imageX == width ? 0 : imageX, imageY);
+
+                    x = color.R * pixScale - 0.5f;
+                    y = color.G * pixScale - 0.5f;
+                    z = color.B * pixScale - 0.5f;
 
                     Coord c = new Coord(x, y, z);
                     this.coords.Add(c);
-                    if (viewerMode)
-                    {
-                        this.normals.Add(new Coord());
-                        this.uvs.Add(new UVCoord(widthUnit * imageX, heightUnit * imageY));
-                    }
+                    this.normals.Add(new Coord());
+                    this.uvs.Add(new UVCoord(widthUnit * imageX, heightUnit * imageY));
 
                     if (imageY > 0 && imageX > 0)
                     {
@@ -76,42 +91,6 @@ namespace PrimMesher
 
                         this.faces.Add(f1);
                         this.faces.Add(f2);
-
-                        //if (viewerMode)
-                        //{
-                        //    float u2 = widthUnit * imageX;
-                        //    float u1 = u2 - widthUnit;
-                        //    float v2 = heightUnit * imageY;
-                        //    float v1 = v2 - heightUnit;
-
-                        //    ViewerFace vf1 = new ViewerFace(0);
-                        //    vf1.v1 = coords[f1.v1];
-                        //    vf1.v2 = coords[f1.v2];
-                        //    vf1.v3 = coords[f1.v3];
-                        //    vf1.CalcSurfaceNormal();  //todo - vertex normals
-                        //    vf1.uv1.U = u1;
-                        //    vf1.uv1.V = v1;
-                        //    vf1.uv2.U = u1;
-                        //    vf1.uv2.V = v2;
-                        //    vf1.uv3.U = u2;
-                        //    vf1.uv3.V = v2;
-
-                        //    ViewerFace vf2 = new ViewerFace(0);
-                        //    vf2.v1 = coords[f2.v1];
-                        //    vf2.v2 = coords[f2.v2];
-                        //    vf2.v3 = coords[f2.v3];
-                        //    vf2.CalcSurfaceNormal();
-                        //    vf2.uv1.U = u1;
-                        //    vf2.uv1.V = v1;
-                        //    vf2.uv2.U = u2;
-                        //    vf2.uv2.V = v2;
-                        //    vf2.uv3.U = u2;
-                        //    vf2.uv3.V = v1;
-
-                        //    this.viewerFaces.Add(vf1);
-                        //    this.viewerFaces.Add(vf2);
-
-                        //}
                     }
                 }
             }
@@ -132,6 +111,17 @@ namespace PrimMesher
                 int numCoords = this.coords.Count;
                 for (int i = 0; i < numCoords; i++)
                     this.coords[i].Normalize();
+
+                if (sculptType != SculptType.plane)
+                { // blend the vertex normals at the cylinder seam
+                    for (int imageY = 0; imageY < height; imageY++)
+                    {
+                        int pixelsAcross = sculptType == SculptType.plane ? width : width + 1;
+                        int rowOffset = imageY * pixelsAcross;
+
+                        this.normals[rowOffset] = this.normals[rowOffset + width - 1] = (this.normals[rowOffset] + this.normals[rowOffset + width - 1]).Normalize();
+                    }
+                }
 
                 foreach (Face face in this.faces)
                 {
