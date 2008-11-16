@@ -50,6 +50,11 @@ namespace PrimMesher
             return scaledImage;
         }
 
+        public SculptMesh SculptMeshFromFile(string fileName, SculptType sculptType, int lod, bool viewerMode)
+        {
+            return new SculptMesh((Bitmap)Bitmap.FromFile(fileName), sculptType, lod, viewerMode);
+        }
+
         public SculptMesh(Bitmap sculptBitmap, SculptType sculptType, int lod, bool viewerMode)
         {
             coords = new List<Coord>();
