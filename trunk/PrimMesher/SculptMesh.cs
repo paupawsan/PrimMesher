@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 
 namespace PrimMesher
 {
+
     public class SculptMesh
     {
         public List<Coord> coords;
@@ -20,12 +21,50 @@ namespace PrimMesher
         public enum SculptType { sphere = 1, torus = 2, plane = 3, cylinder = 4};
         private const float pixScale = 0.00390625f; // 1.0 / 256
 
-        public SculptMesh(Bitmap bitmap, SculptType sculptType, int lod, bool viewerMode)
+        private Bitmap ScaleImage(Bitmap srcImage, float scale)
+        {
+            int sourceWidth = srcImage.Width;
+            int sourceHeight = srcImage.Height;
+            int sourceX = 0;
+            int sourceY = 0;
+
+            int destX = 0;
+            int destY = 0;
+            int destWidth = (int)(sourceWidth * scale);
+            int destHeight = (int)(sourceHeight * scale);
+
+            Bitmap scaledImage = new Bitmap(destWidth, destHeight,
+                                     PixelFormat.Format24bppRgb);
+            scaledImage.SetResolution(srcImage.HorizontalResolution,
+                                    srcImage.VerticalResolution);
+
+            Graphics grPhoto = Graphics.FromImage(scaledImage);
+            grPhoto.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+
+            grPhoto.DrawImage(srcImage,
+                new Rectangle(destX, destY, destWidth, destHeight),
+                new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight),
+                GraphicsUnit.Pixel);
+
+            grPhoto.Dispose();
+            return scaledImage;
+        }
+
+        public SculptMesh(Bitmap sculptBitmap, SculptType sculptType, int lod, bool viewerMode)
         {
             coords = new List<Coord>();
             faces = new List<Face>();
             normals = new List<Coord>();
             uvs = new List<UVCoord>();
+            
+            float sourceScaleFactor = (float) lod / (float) Math.Max(sculptBitmap.Width, sculptBitmap.Height);
+            bool scaleSourceImage = sourceScaleFactor < 1.0f ? true : false;
+
+            Bitmap bitmap;
+            if (scaleSourceImage)
+                bitmap = ScaleImage(sculptBitmap, sourceScaleFactor);
+            else
+                bitmap = sculptBitmap;
 
             viewerFaces = new List<ViewerFace>();
 
@@ -95,6 +134,9 @@ namespace PrimMesher
                 }
             }
 
+            if (scaleSourceImage)
+                bitmap.Dispose();
+
             if (viewerMode)
             {  // compute vertex normals by summing all the surface normals of all the triangles sharing
                 // each vertex and then normalizing
@@ -145,7 +187,6 @@ namespace PrimMesher
 
         public void AddRot(Quat q)
         {
-            Console.WriteLine("AddRot(" + q.ToString() + ")");
             int i;
             int numVerts = this.coords.Count;
 

@@ -2024,7 +2024,6 @@ namespace PrimMesher
 
         public void AddRot(Quat q)
         {
-            Console.WriteLine("AddRot(" + q.ToString() + ")");
             int i;
             int numVerts = this.coords.Count;
 
