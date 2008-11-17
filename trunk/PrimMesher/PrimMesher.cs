@@ -243,6 +243,12 @@ namespace PrimMesher
         public int n2;
         public int n3;
 
+        // uvs
+        public int uv1;
+        public int uv2;
+        public int uv3;
+
+
         public Face(int v1, int v2, int v3)
         {
             primFace = 0;
@@ -254,6 +260,11 @@ namespace PrimMesher
             this.n1 = 0;
             this.n2 = 0;
             this.n3 = 0;
+
+            this.uv1 = 0;
+            this.uv2 = 0;
+            this.uv3 = 0;
+
         }
 
         public Face(int v1, int v2, int v3, int n1, int n2, int n3)
@@ -267,6 +278,10 @@ namespace PrimMesher
             this.n1 = n1;
             this.n2 = n2;
             this.n3 = n3;
+
+            this.uv1 = 0;
+            this.uv2 = 0;
+            this.uv3 = 0;
         }
 
         public Coord SurfaceNormal(List<Coord> coordList)

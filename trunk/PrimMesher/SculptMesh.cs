@@ -15,8 +15,8 @@ namespace PrimMesher
         public List<Face> faces;
 
         public List<ViewerFace> viewerFaces;
-        private List<Coord> normals;
-        private List<UVCoord> uvs;
+        public List<Coord> normals;
+        public List<UVCoord> uvs;
 
         public enum SculptType { sphere = 1, torus = 2, plane = 3, cylinder = 4};
         private const float pixScale = 0.00390625f; // 1.0 / 256
@@ -52,7 +52,10 @@ namespace PrimMesher
 
         public SculptMesh SculptMeshFromFile(string fileName, SculptType sculptType, int lod, bool viewerMode)
         {
-            return new SculptMesh((Bitmap)Bitmap.FromFile(fileName), sculptType, lod, viewerMode);
+            Bitmap bitmap = (Bitmap)Bitmap.FromFile(fileName);
+            SculptMesh sculptMesh = new SculptMesh(bitmap, sculptType, lod, viewerMode);
+            bitmap.Dispose();
+            return sculptMesh;
         }
 
         public SculptMesh(Bitmap sculptBitmap, SculptType sculptType, int lod, bool viewerMode)
@@ -125,13 +128,34 @@ namespace PrimMesher
 
                     Coord c = new Coord(x, y, z);
                     this.coords.Add(c);
-                    this.normals.Add(new Coord());
-                    this.uvs.Add(new UVCoord(widthUnit * imageX, heightUnit * imageY));
+                    if (viewerMode)
+                    {
+                        this.normals.Add(new Coord());
+                        this.uvs.Add(new UVCoord(widthUnit * imageX, heightUnit * imageY));
+                    }
 
                     if (imageY > 0 && imageX > 0)
                     {
-                        Face f1 = new Face(p1, p3, p4);
-                        Face f2 = new Face(p1, p4, p2);
+                        Face f1;
+                        Face f2;
+
+                        if (viewerMode)
+                        {
+                            f1 = new Face(p1, p3, p4, p1, p3, p4);
+                            f1.uv1 = p1;
+                            f1.uv2 = p3;
+                            f1.uv3 = p4;
+
+                            f2 = new Face(p1, p4, p2, p1, p4, p2);
+                            f2.uv1 = p1;
+                            f2.uv2 = p4;
+                            f2.uv3 = p2;
+                        }
+                        else
+                        {
+                            f1 = new Face(p1, p3, p4);
+                            f2 = new Face(p1, p4, p2);
+                        }
 
                         this.faces.Add(f1);
                         this.faces.Add(f2);
@@ -177,13 +201,13 @@ namespace PrimMesher
                     vf.v2 = this.coords[face.v2];
                     vf.v3 = this.coords[face.v3];
 
-                    vf.n1 = this.normals[face.v1];
-                    vf.n2 = this.normals[face.v2];
-                    vf.n3 = this.normals[face.v3];
+                    vf.n1 = this.normals[face.n1];
+                    vf.n2 = this.normals[face.n2];
+                    vf.n3 = this.normals[face.n3];
 
-                    vf.uv1 = this.uvs[face.v1];
-                    vf.uv2 = this.uvs[face.v2];
-                    vf.uv3 = this.uvs[face.v3];
+                    vf.uv1 = this.uvs[face.uv1];
+                    vf.uv2 = this.uvs[face.uv2];
+                    vf.uv3 = this.uvs[face.uv3];
 
                     this.viewerFaces.Add(vf);
                 }
