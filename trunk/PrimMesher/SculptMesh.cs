@@ -1,4 +1,31 @@
-﻿using System;
+﻿/*
+ * Copyright (c) Contributors
+ * See CONTRIBUTORS.TXT for a full list of copyright holders.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the OpenSim Project nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -79,24 +106,53 @@ namespace PrimMesher
             int width = bitmap.Width;
             int height = bitmap.Height;
 
-            if (width > lod || height > lod)
-            {
-                // todo: if either width or height are greater than lod then rescale image here
-            }
-
             float widthUnit = 1.0f / width;
-            float heightUnit = 1.0f / height;
+            float heightUnit = 1.0f / (height - 1);
 
             int p1, p2, p3, p4;
             Color color;
             float x, y, z;
 
-            for (int imageY = 0; imageY < height; imageY++)
+            int imageX, imageY;
+
+            if (sculptType == SculptType.sphere)
+            { // average the top and bottom row pixel values so the resulting vertices appear to converge
+                int lastRow = height - 1;
+                int r1 = 0, g1 = 0, b1 = 0;
+                int r2 = 0, g2 = 0, b2 = 0;
+                for (imageX = 0; imageX < width; imageX++)
+                {
+                    Color c1 = bitmap.GetPixel(imageX, 0);
+                    Color c2 = bitmap.GetPixel(imageX, lastRow);
+
+                    r1 += c1.R;
+                    g1 += c1.G;
+                    b1 += c1.B;
+
+                    r2 += c2.R;
+                    g2 += c2.G;
+                    b2 += c2.B;
+                }
+
+                Color newC1 = Color.FromArgb(r1 / width, g1 / width, b1 / width);
+                Color newC2 = Color.FromArgb(r2 / width, g2 / width, b2 / width);
+
+                for (imageX = 0; imageX < width; imageX++)
+                {
+                    bitmap.SetPixel(imageX, 0, newC1);
+                    bitmap.SetPixel(imageX, lastRow, newC2);
+                }
+            }
+
+            
+            int pixelsAcross = sculptType == SculptType.plane ? width : width + 1;
+            int pixelsDown = sculptType == SculptType.sphere || sculptType == SculptType.cylinder ? height + 1 : height;
+            
+            for (imageY = 0; imageY < pixelsDown; imageY++)
             {
                 int rowOffset = imageY * width;
-                int pixelsAcross = sculptType == SculptType.plane ? width : width + 1;
 
-                for (int imageX = 0; imageX < pixelsAcross; imageX++)
+                for (imageX = 0; imageX < pixelsAcross; imageX++)
                 {
                      /*
                      *   p1-----p2
@@ -120,11 +176,11 @@ namespace PrimMesher
                     p2 = p4 - width;
                     p1 = p3 - width;
 
-                    color = bitmap.GetPixel(imageX == width ? 0 : imageX, imageY);
+                    color = bitmap.GetPixel(imageX == width ? 0 : imageX, imageY == height ? height - 1 : imageY);
 
-                    x = color.R * pixScale - 0.5f;
-                    y = color.G * pixScale - 0.5f;
-                    z = color.B * pixScale - 0.5f;
+                    x = (color.R - 128) * pixScale;
+                    y = (color.G - 128) * pixScale;
+                    z = (color.B - 128) * pixScale;
 
                     Coord c = new Coord(x, y, z);
                     this.coords.Add(c);
@@ -136,8 +192,7 @@ namespace PrimMesher
 
                     if (imageY > 0 && imageX > 0)
                     {
-                        Face f1;
-                        Face f2;
+                        Face f1, f2;
 
                         if (viewerMode)
                         {
@@ -185,9 +240,9 @@ namespace PrimMesher
 
                 if (sculptType != SculptType.plane)
                 { // blend the vertex normals at the cylinder seam
-                    for (int imageY = 0; imageY < height; imageY++)
+                    pixelsAcross = width + 1;
+                    for (imageY = 0; imageY < height; imageY++)
                     {
-                        int pixelsAcross = sculptType == SculptType.plane ? width : width + 1;
                         int rowOffset = imageY * pixelsAcross;
 
                         this.normals[rowOffset] = this.normals[rowOffset + width - 1] = (this.normals[rowOffset] + this.normals[rowOffset + width - 1]).Normalize();

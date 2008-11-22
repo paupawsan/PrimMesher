@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -574,7 +574,7 @@ namespace PrimMesher
     /// <summary>
     /// generates a profile for extrusion
     /// </summary>
-    public class Profile
+    internal class Profile
     {
         private const float twoPi = 2.0f * (float)Math.PI;
 
@@ -606,7 +606,7 @@ namespace PrimMesher
             this.faceNumbers = new List<int>();
         }
 
-        public Profile(int sides, float profileStart, float profileEnd, float hollow, int hollowSides, bool createFaces, bool calcVertexNormals)
+        internal Profile(int sides, float profileStart, float profileEnd, float hollow, int hollowSides, bool createFaces, bool calcVertexNormals)
         {
             this.calcVertexNormals = calcVertexNormals;
             this.coords = new List<Coord>();
@@ -931,19 +931,19 @@ namespace PrimMesher
 
         }
 
-        public void MakeFaceUVs()
+        internal void MakeFaceUVs()
         {
             this.faceUVs = new List<UVCoord>();
             foreach (Coord c in this.coords)
                 this.faceUVs.Add(new UVCoord(1.0f - (0.5f + c.X), 1.0f - (0.5f - c.Y)));
         }
 
-        public Profile Clone()
+        internal Profile Clone()
         {
             return this.Clone(true);
         }
 
-        public Profile Clone(bool needFaces)
+        internal Profile Clone(bool needFaces)
         {
             Profile clone = new Profile();
 
@@ -967,12 +967,12 @@ namespace PrimMesher
             return clone;
         }
 
-        public void AddPos(Coord v)
+        internal void AddPos(Coord v)
         {
             this.AddPos(v.X, v.Y, v.Z);
         }
 
-        public void AddPos(float x, float y, float z)
+        internal void AddPos(float x, float y, float z)
         {
             int i;
             int numVerts = this.coords.Count;
@@ -988,7 +988,7 @@ namespace PrimMesher
             }
         }
 
-        public void AddRot(Quat q)
+        internal void AddRot(Quat q)
         {
             int i;
             int numVerts = this.coords.Count;
@@ -1009,7 +1009,7 @@ namespace PrimMesher
             }
         }
 
-        public void Scale(float x, float y)
+        internal void Scale(float x, float y)
         {
             int i;
             int numVerts = this.coords.Count;
@@ -1027,7 +1027,7 @@ namespace PrimMesher
         /// <summary>
         /// Changes order of the vertex indices and negates the center vertex normal. Does not alter vertex normals of radial vertices
         /// </summary>
-        public void FlipNormals()
+        internal void FlipNormals()
         {
             int i;
             int numFaces = this.faces.Count;
@@ -1067,7 +1067,7 @@ namespace PrimMesher
             }
         }
 
-        public void AddValue2FaceVertexIndices(int num)
+        internal void AddValue2FaceVertexIndices(int num)
         {
             int numFaces = this.faces.Count;
             Face tmpFace;
@@ -1082,7 +1082,7 @@ namespace PrimMesher
             }
         }
 
-        public void AddValue2FaceNormalIndices(int num)
+        internal void AddValue2FaceNormalIndices(int num)
         {
             if (this.calcVertexNormals)
             {
@@ -1100,7 +1100,7 @@ namespace PrimMesher
             }
         }
 
-        public void DumpRaw(String path, String name, String title)
+        internal void DumpRaw(String path, String name, String title)
         {
             if (path == null)
                 return;
@@ -1161,6 +1161,10 @@ namespace PrimMesher
 
         public int numPrimFaces = 0;
 
+        /// <summary>
+        /// Human readable string representation of the parameters used to create a mesh.
+        /// </summary>
+        /// <returns></returns>
         public string ParamsToDisplayString()
         {
             string s = "";
@@ -1189,7 +1193,14 @@ namespace PrimMesher
             return s;
         }
 
-
+        /// <summary>
+        /// Constructs a PrimMesh object and creates the profile for extrusion.
+        /// </summary>
+        /// <param name="sides"></param>
+        /// <param name="profileStart"></param>
+        /// <param name="profileEnd"></param>
+        /// <param name="hollow"></param>
+        /// <param name="hollowSides"></param>
         public PrimMesh(int sides, float profileStart, float profileEnd, float hollow, int hollowSides)
         {
             this.coords = new List<Coord>();
@@ -1222,6 +1233,9 @@ namespace PrimMesher
             this.hasHollow = (this.hollow > 0.001f);
         }
 
+        /// <summary>
+        /// Extrudes a profile along a straight line path. Used for prim types box, cylinder, and prism.
+        /// </summary>
         public void ExtrudeLinear()
         {
             this.coords = new List<Coord>();
@@ -1563,7 +1577,10 @@ namespace PrimMesher
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Extrude a profile into a circular path prim mesh. Used for prim types torus, tube, and ring.
+        /// </summary>
         public void ExtrudeCircular()
         {
             this.coords = new List<Coord>();
@@ -1984,7 +2001,12 @@ namespace PrimMesher
         {
             return SurfaceNormal(this.coords[face.v1], this.coords[face.v2], this.coords[face.v3]);
         }
-
+        
+        /// <summary>
+        /// Calculate the surface normal for a face in the list of faces
+        /// </summary>
+        /// <param name="faceIndex"></param>
+        /// <returns></returns>
         public Coord SurfaceNormal(int faceIndex)
         {
             int numFaces = this.faces.Count;
@@ -1994,6 +2016,9 @@ namespace PrimMesher
             return SurfaceNormal(this.faces[faceIndex]);
         }
 
+        /// <summary>
+        /// Calculate surface normals for all of the faces in the list of faces in this mesh
+        /// </summary>
         public void CalcNormals()
         {
             if (normalsProcessed)
@@ -2021,6 +2046,12 @@ namespace PrimMesher
             }
         }
 
+        /// <summary>
+        /// Adds a value to each XYZ vertex coordinate in the mesh
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public void AddPos(float x, float y, float z)
         {
             int i;
@@ -2037,6 +2068,10 @@ namespace PrimMesher
             }
         }
 
+        /// <summary>
+        /// Rotates the mesh
+        /// </summary>
+        /// <param name="q"></param>
         public void AddRot(Quat q)
         {
             int i;
@@ -2072,6 +2107,12 @@ namespace PrimMesher
 
         }
 
+        /// <summary>
+        /// Scales the mesh
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public void Scale(float x, float y, float z)
         {
             int i;
@@ -2097,7 +2138,13 @@ namespace PrimMesher
             }
 
         }
-
+        
+        /// <summary>
+        /// Dumps the mesh to a Blender compatible "Raw" format file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="name"></param>
+        /// <param name="title"></param>
         public void DumpRaw(String path, String name, String title)
         {
             if (path == null)
