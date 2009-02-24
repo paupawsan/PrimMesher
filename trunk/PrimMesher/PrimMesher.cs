@@ -578,6 +578,8 @@ namespace PrimMesher
     {
         private const float twoPi = 2.0f * (float)Math.PI;
 
+        internal string errorMessage = null;
+
         internal List<Coord> coords;
         internal List<Face> faces;
         internal List<Coord> vertexNormals;
@@ -643,8 +645,10 @@ namespace PrimMesher
             try { angles.makeAngles(sides, startAngle, stopAngle); }
             catch (Exception ex)
             {
-                Console.WriteLine("makeAngles failed: Exception: " + ex.ToString());
-                Console.WriteLine("sides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString());
+
+                errorMessage = "makeAngles failed: Exception: " + ex.ToString()
+                + "\nsides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString();
+                
                 return;
             }
 
@@ -663,8 +667,9 @@ namespace PrimMesher
                     try { hollowAngles.makeAngles(hollowSides, startAngle, stopAngle); }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("makeAngles failed: Exception: " + ex.ToString());
-                        Console.WriteLine("sides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString());
+                        errorMessage = "makeAngles failed: Exception: " + ex.ToString()
+                        + "\nsides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString();
+                        
                         return;
                     }
                 }
@@ -1124,6 +1129,7 @@ namespace PrimMesher
 
     public class PrimMesh
     {
+        public string errorMessage = "";
         private const float twoPi = 2.0f * (float)Math.PI;
 
         public List<Coord> coords;
@@ -1311,6 +1317,8 @@ namespace PrimMesher
                 hollow *= 1.414f;
 
             Profile profile = new Profile(this.sides, this.profileStart, this.profileEnd, hollow, this.hollowSides, true, calcVertexNormals);
+            this.errorMessage = profile.errorMessage;
+
             this.numPrimFaces = profile.numPrimFaces;
 
             int cut1Vert = -1;
@@ -1691,6 +1699,8 @@ namespace PrimMesher
                 needEndFaces = true;
 
             Profile profile = new Profile(this.sides, this.profileStart, this.profileEnd, hollow, this.hollowSides, needEndFaces, calcVertexNormals);
+            this.errorMessage = profile.errorMessage;
+
             this.numPrimFaces = profile.numPrimFaces;
 
             int cut1Vert = -1;
