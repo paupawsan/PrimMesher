@@ -214,7 +214,7 @@ namespace PrimMesher
             uvs = new List<UVCoord>();
 
             if (mirror)
-                if (sculptType != SculptType.plane)
+                if (sculptType == SculptType.plane)
                     invert = !invert;
 
             //float sourceScaleFactor = (float)lod / (float)Math.Max(sculptBitmap.Width, sculptBitmap.Height);
@@ -374,6 +374,24 @@ namespace PrimMesher
 
             if (viewerMode)
                 calcVertexNormals(sculptType, width, height);
+        }
+
+        /// <summary>
+        /// Duplicates a SculptMesh object. All object properties are copied by value, including lists.
+        /// </summary>
+        /// <returns></returns>
+        public SculptMesh Copy()
+        {
+            return new SculptMesh(this);
+        }
+
+        public SculptMesh(SculptMesh sm)
+        {
+            coords = new List<Coord>(sm.coords);
+            faces = new List<Face>(sm.faces);
+            viewerFaces = new List<ViewerFace>(sm.viewerFaces);
+            normals = new List<Coord>(sm.normals);
+            uvs = new List<UVCoord>(sm.uvs);
         }
 
         private void calcVertexNormals(SculptType sculptType, int xSize, int ySize)
