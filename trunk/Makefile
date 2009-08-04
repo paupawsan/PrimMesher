@@ -1,5 +1,5 @@
 #
-#	Makefile for PrimMesher
+#	Makefile for PrimMesher 
 #	See http://forge.opensimulator.org/gf/project/primmesher
 #
 #	Release and Debug files are not placed in {obj,bin}/{Release,Debug}
