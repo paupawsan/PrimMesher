@@ -494,6 +494,18 @@ namespace PrimMesher
                 vert.Z += z;
                 this.coords[i] = vert;
             }
+
+            if (this.viewerFaces != null)
+            {
+                int numViewerFaces = this.viewerFaces.Count;
+
+                for (i = 0; i < numViewerFaces; i++)
+                {
+                    ViewerFace v = this.viewerFaces[i];
+                    v.AddPos(x, y, z);
+                    this.viewerFaces[i] = v;
+                }
+            }
         }
 
         /// <summary>
