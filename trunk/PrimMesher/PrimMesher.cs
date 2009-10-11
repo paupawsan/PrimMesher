@@ -2604,9 +2604,6 @@ namespace PrimMesher
                             iNext = startVert;
 
                         int whichVert = i - startVert;
-                        int primFaceNumber = profile.faceNumbers[whichVert];
-                        if (!needEndFaces)
-                            primFaceNumber -= 1;
 
                         newFace.v1 = i;
                         newFace.v2 = i - numVerts;
@@ -2619,6 +2616,10 @@ namespace PrimMesher
 
                         if (this.viewerMode)
                         {
+                            int primFaceNumber = profile.faceNumbers[whichVert];
+                            if (!needEndFaces)
+                                primFaceNumber -= 1;
+
                             // add the side faces to the list of viewerFaces here
                             ViewerFace newViewerFace1 = new ViewerFace(primFaceNumber);
                             ViewerFace newViewerFace2 = new ViewerFace(primFaceNumber);
