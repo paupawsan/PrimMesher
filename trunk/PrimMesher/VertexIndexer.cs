@@ -64,20 +64,19 @@ namespace PrimMesher
     {
         public List<List<ViewerVertex>> viewerVertices;
         public List<List<ViewerPolygon>> viewerPolygons;
+        public int numPrimFaces;
         private int[][] viewerVertIndices;
         
 
         public VertexIndexer(PrimMesh primMesh)
         {
-            int numPrimFaces = primMesh.numPrimFaces;
-
             int maxPrimFaceNumber = 0;
+
             foreach (ViewerFace vf in primMesh.viewerFaces)
                 if (maxPrimFaceNumber < vf.primFaceNumber)
                     maxPrimFaceNumber = vf.primFaceNumber;
 
-            if (numPrimFaces < maxPrimFaceNumber + 1)
-                numPrimFaces = maxPrimFaceNumber + 1;
+            this.numPrimFaces = maxPrimFaceNumber + 1;
 
             int[] numViewerVerts = new int[numPrimFaces];
             int[] numVertsPerPrimFace = new int[numPrimFaces];
