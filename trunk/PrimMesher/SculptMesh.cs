@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// to build without references to System.Drawing, comment this out
+#define SYSTEM_DRAWING
+
 using System;
 using System.Collections.Generic;
 using System.Text;
