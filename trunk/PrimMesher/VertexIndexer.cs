@@ -66,7 +66,11 @@ namespace PrimMesher
         public List<List<ViewerPolygon>> viewerPolygons;
         public int numPrimFaces;
         private int[][] viewerVertIndices;
-        
+
+        public VertexIndexer()
+        {
+        }
+
 
         public VertexIndexer(PrimMesh primMesh)
         {
